@@ -33,6 +33,7 @@ publicRouter.get('/catalog', async (_req, res) => {
         currency: p.currency,
         metal: p.metal || undefined,
         image: p.image,
+        images: p.images && p.images.length > 0 ? p.images : [p.image], // Return images array or fallback to single image
         rating: p.rating ?? undefined,
       })),
     })
@@ -55,6 +56,7 @@ publicRouter.get('/catalog', async (_req, res) => {
           currency: 'INR',
           metal: 'Gold',
           image: '/images/gold-ring.jpg',
+          images: ['/images/gold-ring-1.jpg', '/images/gold-ring-2.jpg', '/images/gold-ring-3.jpg'],
           rating: 4.5,
         },
         {
@@ -65,6 +67,7 @@ publicRouter.get('/catalog', async (_req, res) => {
           currency: 'INR',
           metal: 'Gold',
           image: '/images/diamond-necklace.jpg',
+          images: ['/images/diamond-necklace-1.jpg', '/images/diamond-necklace-2.jpg'],
           rating: 4.8,
         },
       ],
