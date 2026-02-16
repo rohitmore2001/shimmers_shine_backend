@@ -13,8 +13,22 @@ import { requireAdmin } from './middleware/requireAdmin.js'
 export function createApp() {
   const app = express()
 
-  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173'
-  const origin = corsOrigin === '*' ? true : corsOrigin
+  const corsOrigin = process.env.CORS_ORIGIN || 'https://api.shimmersnshine.in'
+  const origin = (() => {
+    if (corsOrigin === '*') return true
+
+    const allowed = corsOrigin
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+
+    if (allowed.length <= 1) return allowed[0] || corsOrigin
+
+    return (requestOrigin, callback) => {
+      if (!requestOrigin) return callback(null, true)
+      return callback(null, allowed.includes(requestOrigin))
+    }
+  })()
 
   app.use(
     cors({
@@ -28,12 +42,22 @@ export function createApp() {
   app.use('/api', publicRouter)
   app.use('/api/payments', publicPaymentsRouter)
 
+  app.use('/api/api', publicRouter)
+  app.use('/api/api/payments', publicPaymentsRouter)
+
   app.use('/api/admin/auth', adminAuthRouter)
   app.use('/api/admin/categories', requireAdmin, adminCategoriesRouter)
   app.use('/api/admin/products', requireAdmin, adminProductsRouter)
   app.use('/api/admin/coupons', requireAdmin, adminCouponsRouter)
   app.use('/api/admin/orders', requireAdmin, adminOrdersRouter)
   app.use('/api/admin/customers', requireAdmin, adminCustomersRouter)
+
+  app.use('/api/api/admin/auth', adminAuthRouter)
+  app.use('/api/api/admin/categories', requireAdmin, adminCategoriesRouter)
+  app.use('/api/api/admin/products', requireAdmin, adminProductsRouter)
+  app.use('/api/api/admin/coupons', requireAdmin, adminCouponsRouter)
+  app.use('/api/api/admin/orders', requireAdmin, adminOrdersRouter)
+  app.use('/api/api/admin/customers', requireAdmin, adminCustomersRouter)
 
   return app
 }
